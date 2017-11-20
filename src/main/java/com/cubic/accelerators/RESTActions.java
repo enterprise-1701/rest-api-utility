@@ -1,5 +1,6 @@
 package com.cubic.accelerators;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -14,12 +15,25 @@ import com.cubic.genericutils.JsonUtil;
 import com.cubic.genericutils.XmlUtil;
 import com.cubic.logutils.Log4jUtil;
 import com.cubic.reportengine.report.CustomReports;
+import com.sun.codemodel.JCodeModel;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.jsonschema2pojo.DefaultGenerationConfig;
+import org.jsonschema2pojo.GenerationConfig;
+import org.jsonschema2pojo.Jackson2Annotator;
+import org.jsonschema2pojo.SchemaGenerator;
+import org.jsonschema2pojo.SchemaMapper;
+import org.jsonschema2pojo.SchemaStore;
+import org.jsonschema2pojo.SourceType;
+import org.jsonschema2pojo.rules.RuleFactory;
 
 /**
  * This class contains the implementation for generic methods to work with rest Json and XML webservices. 
@@ -1752,6 +1766,41 @@ public class RESTActions {
 	}
 	}
 
+	/**
+	 * Takes a json schema document and returns Pojo Java classes
+	 * 
+	 * @param jsonBeanName - The Pojo class name<br> 
+	 * @param jsonSchemaFQName - json schema fully qualified name, e.g. "C:\temp\rest\jsonschemas\paymentRequest.json"<br> 
+	 * @param packageName - Package name of the pojo java class, e.g. "com.cubic.rest.beans"<br> 
+	 * @param destDir - Destination directory of the package, e.g. "src\\main\\java"<br> 
+
+	 */
+	public void jsonBeanGenerator(String jsonBeanName, String jsonSchemaFQName, String packageName, String destDir){
+		JCodeModel codeModel = new JCodeModel();
+		try {
+			URL source = new URL("file:///"+jsonSchemaFQName);
+			GenerationConfig config = new DefaultGenerationConfig() {
+				@Override
+				public boolean isGenerateBuilders() { // set config option by overriding method
+					return true;
+				}
+				public SourceType getSourceType(){
+					return SourceType.JSONSCHEMA;
+				}
+			};
+
+			SchemaMapper mapper = new SchemaMapper(new RuleFactory(config, new Jackson2Annotator(config), new SchemaStore()), new SchemaGenerator());
+			mapper.generate(codeModel, jsonBeanName, packageName, source);
+
+			codeModel.build(new File(destDir));
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}  
+	}
+	
 
 	
 }
