@@ -1,23 +1,36 @@
 package com.cubic.accelerators;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
+import com.cubic.genericutils.GenericConstants;
 import com.cubic.genericutils.JsonUtil;
 import com.cubic.genericutils.XmlUtil;
 import com.cubic.logutils.Log4jUtil;
 import com.cubic.reportengine.report.CustomReports;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
@@ -28,7 +41,10 @@ public class RESTActions {
 	private final Logger LOG = Logger.getLogger(this.getClass().getName());
 	private CustomReports customReports = null;
 	private String testCaseName = null;
-
+	
+	private String isSSLCertificationVerificationValue  = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("isSSLCertificationVerifcationEnabled");
+	
+	
 	/**
 	 * Constructor (creates the RESTActions instance)
 	 * 
@@ -202,8 +218,22 @@ public class RESTActions {
 		ClientResponse clientResponse = null;
 		try {
 			LOG.info("Class name : " + getCallerClassName() + "Method name : " + getCallerMethodName());
-
-			WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+			Client client = null;
+			
+		//	String isSSLCertificationVerifcationEnabled = "ON";
+			if(isSSLCertificationVerificationValue==null){
+				isSSLCertificationVerificationValue="ON";
+			}
+			
+			if(isSSLCertificationVerificationValue.equalsIgnoreCase("off")){
+				//Specific to SSL
+				client = hostIgnoringClient();
+			}else{
+				//With out SSL
+				client = Client.create(new DefaultClientConfig());
+			}
+			 WebResource resource = client.resource(url);
+			//WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
 
 			// If url query parameters are present
 			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
@@ -470,8 +500,22 @@ public class RESTActions {
 	public ClientResponse postClientResponse(String url, String input, Hashtable<String, String> requestHeaders,
 			Hashtable<String, String> urlQueryParameters, String contentType) throws Throwable {
 		ClientResponse clientResponse = null;
+		Client client =null;
 		try {
-			WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+			
+			if(isSSLCertificationVerificationValue==null){
+				isSSLCertificationVerificationValue="ON";
+			}
+			if(isSSLCertificationVerificationValue.equalsIgnoreCase("off")){
+				//Specific to SSL
+				client = hostIgnoringClient();
+			}else{
+				//With out SSL
+				client = Client.create(new DefaultClientConfig());
+			}
+			 WebResource resource = client.resource(url);
+			
+		    //WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
 
 			// If url query parameters are present
 			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
@@ -714,8 +758,24 @@ public class RESTActions {
 	public ClientResponse putClientResponse(String url, String input, Hashtable<String, String> requestHeaders,
 			Hashtable<String, String> urlQueryParameters, String contentType) throws Throwable {
 		ClientResponse clientResponse = null;
+		Client client =null;
 		try {
-			WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+			
+			if(isSSLCertificationVerificationValue==null){
+				isSSLCertificationVerificationValue="ON";
+			}
+			
+			if(isSSLCertificationVerificationValue.equalsIgnoreCase("off")){
+				//Specific to SSL
+				client = hostIgnoringClient();
+			}else{
+				//With out SSL
+				client = Client.create(new DefaultClientConfig());
+			}
+			WebResource resource = client.resource(url);
+			
+			 
+			//WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
 
 			// If url query parameters are present
 			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
@@ -960,11 +1020,25 @@ public class RESTActions {
 	public ClientResponse deleteClientResponse(String url, Hashtable<String, String> requestHeaders,
 			Hashtable<String, String> urlQueryParameters, String contentType) throws Throwable {
 		ClientResponse clientResponse = null;
+		Client client = null;
 
 		try {
 			LOG.info("Class name : " + getCallerClassName() + "Method name : " + getCallerMethodName());
-
-			WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+			if(isSSLCertificationVerificationValue==null){
+				isSSLCertificationVerificationValue="ON";
+			}
+			
+			if(isSSLCertificationVerificationValue.equalsIgnoreCase("off")){
+				//Specific to SSL
+				client = hostIgnoringClient();
+			}else{
+				//With out SSL
+				client = Client.create(new DefaultClientConfig());
+			}
+			 WebResource resource = client.resource(url);
+			
+			
+			//WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
 
 			// If url query parameters are present
 			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
@@ -1751,7 +1825,51 @@ public class RESTActions {
 			}
 	}
 	}
+	
+	/*
+	 * Ignore the Certification while executing rest calls
+	 */
 
+	public Client hostIgnoringClient() {
+	    try{
+	   
+	    TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+			public X509Certificate[] getAcceptedIssuers() {
+				// TODO Auto-generated method stub
+				return new X509Certificate[0];
+			}
+			public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+				// TODO Auto-generated method stub
+			}
+			public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+				// TODO Auto-generated method stub
+				
+			}
+		}};
+	    
+	        SSLContext sslcontext = SSLContext.getInstance( "TLS" );
+	        sslcontext.init( null, trustAllCerts, new java.security.SecureRandom());
+	        DefaultClientConfig config = new DefaultClientConfig();
+	        Map<String, Object> properties = config.getProperties();
+	        HTTPSProperties httpsProperties = new HTTPSProperties(
+	                new HostnameVerifier()
+	                {
+	                    @Override
+	                    public boolean verify( String s, SSLSession sslSession )
+	                    {
+	                        return true;
+	                    }
+	                }, sslcontext
+	        );
+	        properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
+	        config.getClasses().add( JacksonJsonProvider.class );
+	        return Client.create(config);
+	    }
+	    catch ( KeyManagementException | NoSuchAlgorithmException e )
+	    {
+	        throw new RuntimeException( e );
+	    }
+	}
 
 	
 }
