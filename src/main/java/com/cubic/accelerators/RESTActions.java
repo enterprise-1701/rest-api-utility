@@ -261,6 +261,80 @@ public class RESTActions {
 		return clientResponse;
 	}
 
+	/**
+	 * Generic to process the "GET" request
+	 * 
+	 * @param url End point url
+	 * @param requestHeaders Request header information,<br> 
+	 * 							 if 'headerParameters' are null then 'headerParameters' are ignored.  
+	 * @param urlQueryParameters url parameters, <br>
+	 * 							   if 'urlQueryParameters' are null then 'urlQueryParameters' are ignored.  
+	 * @param contentType java.lang.String<br>
+	 *                      Ex: contentType = "application/json"
+	 * @param options java.util.Hashtable<br>                     
+	 *                      is added for handling additional method level arguments.
+	 * @return ClientResponse : com.sun.jersey.api.client.ClientResponse
+	 */
+	public ClientResponse getClientResponse(String url, Hashtable<String, String> requestHeaders,
+			Hashtable<String, String> urlQueryParameters, String contentType, Hashtable<String, String> options) {
+		ClientResponse clientResponse = null;
+		try {
+			LOG.info("Class name : " + getCallerClassName() + "Method name : " + getCallerMethodName());
+
+			WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+
+			// If url query parameters are present
+			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
+				MultivaluedMap<String, String> queryParams = convertHashTableToMultivaluedMap(urlQueryParameters);
+				resource = resource.queryParams(queryParams);
+			}
+
+			WebResource.Builder builder = resource.accept(contentType);
+
+			// If request headers are present
+			if ((requestHeaders != null) && (requestHeaders.keySet().toArray().length > 0)) {
+				for (String key : requestHeaders.keySet()) {
+					builder.header(key, requestHeaders.get(key));
+				}
+			}
+
+			clientResponse = builder.get(ClientResponse.class);
+
+			LOG.info("Response : "+clientResponse); 
+		} catch (Throwable e) {
+			
+			//IF exception handling is disabled then exception will not be thrown and failure report is not added.
+			//Below logic is added for handling the negative scenarios(i.e. test scripts).
+			if(!isExceptionDisabled(options)){
+				LOG.fatal(Log4jUtil.getStackTrace(e));
+				failureReport("Retrieving Client Response ",e.toString());
+				throw new RuntimeException(e);
+			}
+			
+		}
+		return clientResponse;
+	}
+
+
+	/**Verify ExceptionHandling is disabled or NOT 
+	 * 
+	 * @param options
+	 * @return
+	 */
+	private boolean isExceptionDisabled(Hashtable<String, String> options){
+		
+		if(options!=null){
+			String disableExceptions = options.get(RESTConstants.DISABLE_EXCEPTIONS);
+			boolean isDisableExceptions =  (disableExceptions==null || disableExceptions.trim().length()<=0) ? (false) :
+														(disableExceptions.trim().equalsIgnoreCase("true") ? true : false);
+			return isDisableExceptions;
+		}else{
+			return false;
+		}
+		
+	}
+	
+
 	/**<pre>
 	 * Generic to process the "GET" request
 	 *  - This method returns both response and response headers.
@@ -548,6 +622,78 @@ public class RESTActions {
 		return clientResponse;
 	}
 
+	/**
+	 * Generic to process the "POST" request.
+	 * 
+	 * @param url End point url
+	 * @param input input restWebservices request input data 
+	 * @param requestHeaders Request header information, <br>
+	 * 							 if 'headerParameters' are null then 'headerParameters' are ignored.  
+	 * @param urlQueryParameters url parameters, <br>
+	 * 							   if 'urlQueryParameters' are null then 'urlQueryParameters' are ignored.  
+	 * @param contentType java.lang.String<br>
+	 *                      Ex: contentType = "application/json"
+	 * @param options java.util.Hashtable<br>                     
+	 *                      is added for handling additional method level arguments.                      
+	 * @return ClientResponse com.sun.jersey.api.client.ClientResponse
+	 * @throws Throwable
+	 */
+	public ClientResponse postClientResponse(String url, String input, Hashtable<String, String> requestHeaders,
+			Hashtable<String, String> urlQueryParameters, String contentType, Hashtable<String, String> options) throws Throwable {
+		ClientResponse clientResponse = null;
+		Client client =null;
+		try {
+			
+			if(isSSLCertificationVerificationValue==null){
+				isSSLCertificationVerificationValue="ON";
+			}
+			if(isSSLCertificationVerificationValue.equalsIgnoreCase("off")){
+				//Specific to SSL
+				client = hostIgnoringClient();
+			}else{
+				//With out SSL
+				client = Client.create(new DefaultClientConfig());
+			}
+			 WebResource resource = client.resource(url);
+			
+		    //WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+
+			// If url query parameters are present
+			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
+				MultivaluedMap<String, String> queryParams = convertHashTableToMultivaluedMap(urlQueryParameters);
+				resource = resource.queryParams(queryParams);
+			}
+
+			WebResource.Builder builder = resource.accept(contentType);
+
+			// If request headers are present
+			if ((requestHeaders != null) && (requestHeaders.keySet().toArray().length > 0)) {
+				for (String key : requestHeaders.keySet()) {
+					builder.header(key, requestHeaders.get(key));
+				}
+			}
+
+			if (input == null) {
+				clientResponse = builder.post(ClientResponse.class);
+			} else {
+				clientResponse = builder.post(ClientResponse.class, input);
+			}
+
+			LOG.info("Response : "+clientResponse);
+		} catch (Exception e) {
+			
+			//IF exception handling is disabled then exception will not be thrown and failure report is not added.
+			//Below logic is added for handling the negative scenarios(i.e. test scripts).
+			if(!isExceptionDisabled(options)){
+				LOG.fatal(Log4jUtil.getStackTrace(e));
+				e.printStackTrace();
+				failureReport("Retrieving Client Response ",e.toString());
+				throw new RuntimeException(e);
+			}			
+		}
+		return clientResponse;
+	}
+	
 	/**<pre>
 	 * Generic to process the "POST" request
 	 *  - This method returns both response and response headers.
@@ -808,6 +954,80 @@ public class RESTActions {
 		return clientResponse;
 	}
 
+	/**
+	 * Generic to process the "PUT" request.
+	 * 
+	 * @param url End point url
+	 * @param input restWebservices request input data 
+	 * @param requestHeaders Request header information,<br> 
+	 * 							 if 'headerParameters' are null then 'headerParameters' are ignored.  
+	 * @param urlQueryParameters url parameters, <br>
+	 * 							   if 'urlQueryParameters' are null then 'urlQueryParameters' are ignored.  
+	 * @param contentType java.lang.String<br>
+	 *                      Ex: contentType = "application/json"
+	 * @param options java.util.Hashtable<br>                     
+	 *                      is added for handling additional method level arguments.
+	 * @return ClientResponse : com.sun.jersey.api.client.ClientResponse
+	 * @throws Throwable java.lang.Throwable
+	 */
+	public ClientResponse putClientResponse(String url, String input, Hashtable<String, String> requestHeaders,
+			Hashtable<String, String> urlQueryParameters, String contentType, Hashtable<String, String> options) throws Throwable {
+		ClientResponse clientResponse = null;
+		Client client =null;
+		try {
+			
+			if(isSSLCertificationVerificationValue==null){
+				isSSLCertificationVerificationValue="ON";
+			}
+			
+			if(isSSLCertificationVerificationValue.equalsIgnoreCase("off")){
+				//Specific to SSL
+				client = hostIgnoringClient();
+			}else{
+				//With out SSL
+				client = Client.create(new DefaultClientConfig());
+			}
+			WebResource resource = client.resource(url);
+			
+			 
+			//WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+
+			// If url query parameters are present
+			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
+				MultivaluedMap<String, String> queryParams = convertHashTableToMultivaluedMap(urlQueryParameters);
+				resource = resource.queryParams(queryParams);
+			}
+
+			WebResource.Builder builder = resource.accept(contentType);
+
+			// If request headers are present
+			if ((requestHeaders != null) && (requestHeaders.keySet().toArray().length > 0)) {
+				for (String key : requestHeaders.keySet()) {
+					builder.header(key, requestHeaders.get(key));
+				}
+			}
+
+			if (input == null) {
+				clientResponse = builder.put(ClientResponse.class);
+			} else {
+				clientResponse = builder.put(ClientResponse.class, input);
+			}
+
+			LOG.info("Response : "+clientResponse);
+		} catch (Exception e) {
+			
+			//IF exception handling is disabled then exception will not be thrown and failure report is not added.
+			//Below logic is added for handling the negative scenarios(i.e. test scripts).
+			if(!isExceptionDisabled(options)){
+				LOG.fatal(Log4jUtil.getStackTrace(e));
+				failureReport("Retrieving Client Response ",e.toString());
+				throw new RuntimeException(e);
+			}
+			
+		}
+
+		return clientResponse;
+	}	
 	/**<pre>
 	 * Generic to process the "PUT" request
 	 *  - This method returns both response and response headers.
@@ -1066,6 +1286,75 @@ public class RESTActions {
 		return clientResponse;
 	}
 
+	/**
+	 * Generic to process the "DELETE" request
+	 * 
+	 * @param url End point url
+	 * @param requestHeaders Request header information, <br>
+	 * 							 if 'headerParameters' are null then 'headerParameters' are ignored.  
+	 * @param urlQueryParameters url parameters, <br>
+	 * 							   if 'urlQueryParameters' are null then 'urlQueryParameters' are ignored.  
+	 * @param contentType java.lang.String<br>
+	 *                      ExcontentType = "application/json"
+	 * @param options java.util.Hashtable<br>                     
+	 *                      is added for handling additional method level arguments.                      
+	 * @return ClientResponse com.sun.jersey.api.client.ClientResponse
+	 * @throws Throwable java.lang.Throwable
+	 */
+	public ClientResponse deleteClientResponse(String url, Hashtable<String, String> requestHeaders,
+			Hashtable<String, String> urlQueryParameters, String contentType, Hashtable<String, String> options) throws Throwable {
+		ClientResponse clientResponse = null;
+		Client client = null;
+
+		try {
+			LOG.info("Class name : " + getCallerClassName() + "Method name : " + getCallerMethodName());
+			if(isSSLCertificationVerificationValue==null){
+				isSSLCertificationVerificationValue="ON";
+			}
+			
+			if(isSSLCertificationVerificationValue.equalsIgnoreCase("off")){
+				//Specific to SSL
+				client = hostIgnoringClient();
+			}else{
+				//With out SSL
+				client = Client.create(new DefaultClientConfig());
+			}
+			 WebResource resource = client.resource(url);
+			
+			
+			//WebResource resource = Client.create(new DefaultClientConfig()).resource(url);
+
+			// If url query parameters are present
+			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
+				MultivaluedMap<String, String> queryParams = convertHashTableToMultivaluedMap(urlQueryParameters);
+				resource = resource.queryParams(queryParams);
+			}
+
+			WebResource.Builder builder = resource.accept(contentType);
+
+			// If request headers are present
+			if ((requestHeaders != null) && (requestHeaders.keySet().toArray().length > 0)) {
+				for (String key : requestHeaders.keySet()) {
+					builder.header(key, requestHeaders.get(key));
+				}
+			}
+
+			clientResponse = builder.delete(ClientResponse.class);
+
+			LOG.info("Response : "+clientResponse);
+		} catch (Exception e) {
+			
+			//IF exception handling is disabled then exception will not be thrown and failure report is not added.
+			//Below logic is added for handling the negative scenarios(i.e. test scripts).
+			if(!isExceptionDisabled(options)){
+				LOG.fatal(Log4jUtil.getStackTrace(e));
+				e.printStackTrace();
+				failureReport("Retrieving Client Response ",e.toString());
+				throw new RuntimeException(e);
+			}			
+		}
+		return clientResponse;
+	}	
 	/**<pre>
 	 * Generic to process the "GET" request
 	 *  - This method returns both response and response headers.
@@ -1616,6 +1905,71 @@ public class RESTActions {
 			e.printStackTrace();
 			failureReport("Retrieving Client Response ",e.toString());			
 			throw new RuntimeException(e);
+		}
+		return clientResponse;
+	}	
+
+	/**
+	 * Generic to process the "PATCH" request.
+	 * 
+	 * @param url End point url
+	 * @param input input restWebservices request input data 
+	 * @param requestHeaders Request header information, <br>
+	 * 							 if 'headerParameters' are null then 'headerParameters' are ignored.  
+	 * @param urlQueryParameters url parameters, <br>
+	 * 							   if 'urlQueryParameters' are null then 'urlQueryParameters' are ignored.  
+	 * @param contentType java.lang.String<br>
+	 *                      Ex: contentType = "application/json"
+	 * @param options java.util.Hashtable<br>                     
+	 *                      is added for handling additional method level arguments.
+	 * @return ClientResponse com.sun.jersey.api.client.ClientResponse
+	 * @throws Throwable
+	 */
+	public ClientResponse patchClientResponse(String url, String input, Hashtable<String, String> requestHeaders,
+			Hashtable<String, String> urlQueryParameters, String contentType, Hashtable<String, String> options) throws Throwable {
+		ClientResponse clientResponse = null;
+		try {
+			
+			DefaultClientConfig config = new DefaultClientConfig();
+			
+			//This workaround has some limitation - you can't put an entity to the request. And additionally, 
+			//it \*probably\* wont work on some containers and maybe in future versions of JDK (containers sometimes have their own implementation of HttpURLConnection).
+		    config.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
+		    
+			WebResource resource = Client.create(config).resource(url);
+
+			// If url query parameters are present
+			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
+				MultivaluedMap<String, String> queryParams = convertHashTableToMultivaluedMap(urlQueryParameters);
+				resource = resource.queryParams(queryParams);
+			}
+
+			WebResource.Builder builder = resource.accept(contentType);
+
+			// If request headers are present
+			if ((requestHeaders != null) && (requestHeaders.keySet().toArray().length > 0)) {
+				for (String key : requestHeaders.keySet()) {
+					builder.header(key, requestHeaders.get(key));
+				}
+			}
+
+			if (input == null) {
+				clientResponse = builder.method("PATCH", ClientResponse.class);
+			} else {
+				clientResponse = builder.method("PATCH", ClientResponse.class, input);
+			}
+
+			LOG.info("Response : "+clientResponse);
+		} catch (Exception e) {
+			
+			//IF exception handling is disabled then exception will not be thrown and failure report is not added.
+			//Below logic is added for handling the negative scenarios(i.e. test scripts).
+			if(!isExceptionDisabled(options)){
+				LOG.fatal(Log4jUtil.getStackTrace(e));
+				e.printStackTrace();
+				failureReport("Retrieving Client Response ",e.toString());
+				throw new RuntimeException(e);
+			}			
 		}
 		return clientResponse;
 	}	

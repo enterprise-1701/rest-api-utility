@@ -7,5 +7,6 @@ public interface RESTConstants {
 	String APPLICATION_JSON = "application/json";
 	String APPLICATION_XML = "application/xml";
 	String APPLICATION_TEXT = "application/text";
+	String DISABLE_EXCEPTIONS = "disableExceptions";
 }
 
