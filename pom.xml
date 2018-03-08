@@ -53,7 +53,7 @@
     <dependency>
 	    <groupId>com.cubic.testutil</groupId>
 	    <artifactId>testutil</artifactId>
-	    <version>1.1</version>  
+	    <version>1.2</version>  
     </dependency>
     <!-- Un-Comment below restaction and jersey dependency to work with Rest library -->
     <dependency>
