@@ -2,6 +2,8 @@ package com.cubic.accelerators;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -19,26 +21,6 @@ import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-
-import com.cubic.genericutils.GenericConstants;
-import com.cubic.genericutils.JsonUtil;
-import com.cubic.genericutils.XmlUtil;
-import com.cubic.logutils.Log4jUtil;
-import com.cubic.reportengine.report.CustomReports;
-import com.sun.codemodel.JCodeModel;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.client.urlconnection.HTTPSProperties;
-import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.jsonschema2pojo.DefaultGenerationConfig;
 import org.jsonschema2pojo.GenerationConfig;
 import org.jsonschema2pojo.Jackson2Annotator;
@@ -47,6 +29,22 @@ import org.jsonschema2pojo.SchemaMapper;
 import org.jsonschema2pojo.SchemaStore;
 import org.jsonschema2pojo.SourceType;
 import org.jsonschema2pojo.rules.RuleFactory;
+import org.w3c.dom.Document;
+
+import com.cubic.genericutils.GenericConstants;
+import com.cubic.genericutils.JsonUtil;
+import com.cubic.genericutils.XmlUtil;
+import com.cubic.logutils.Log4jUtil;
+import com.cubic.reportengine.report.CustomReports;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.sun.codemodel.JCodeModel;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
+import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * This class contains the implementation for generic methods to work with rest Json and XML webservices. 
@@ -1238,10 +1236,17 @@ public class RESTActions {
 		return responseHeaderAndResponseBodyTable;
 	}
 	
+	public ClientResponse deleteClientResponse(String url, Hashtable<String, String> requestHeaders,
+			Hashtable<String, String> urlQueryParameters, String contentType) throws Throwable {
+
+		return deleteClientResponse(url, null, requestHeaders, urlQueryParameters, contentType);
+	}
+	
 	/**
-	 * Generic to process the "DELETE" request
+	 * Generic to process the "DELETE" request with request body payload.
 	 * 
 	 * @param url End point url
+	 * @param input input restWebservices request body data 
 	 * @param requestHeaders Request header information, <br>
 	 * 							 if 'headerParameters' are null then 'headerParameters' are ignored.  
 	 * @param urlQueryParameters url parameters, <br>
@@ -1251,7 +1256,7 @@ public class RESTActions {
 	 * @return ClientResponse com.sun.jersey.api.client.ClientResponse
 	 * @throws Throwable java.lang.Throwable
 	 */
-	public ClientResponse deleteClientResponse(String url, Hashtable<String, String> requestHeaders,
+	public ClientResponse deleteClientResponse(String url, String input, Hashtable<String, String> requestHeaders,
 			Hashtable<String, String> urlQueryParameters, String contentType) throws Throwable {
 		ClientResponse clientResponse = null;
 		Client client = null;
@@ -1289,7 +1294,11 @@ public class RESTActions {
 				}
 			}
 
-			clientResponse = builder.delete(ClientResponse.class);
+			if (input == null) {
+				clientResponse = builder.delete(ClientResponse.class);
+			} else {
+				clientResponse = builder.delete(ClientResponse.class, input);
+			}
 
 			LOG.info("Response : "+clientResponse);
 		} catch (Exception e) {
