@@ -72,7 +72,7 @@ public class RESTEngine{
 			}
 			
 			
-			TestRailUtil.generateTestRunsForTestCases(testRailProjectID,testRailSuiteID,customReports.getCustomReportBean().getSuiteStartDateAndTime());
+			//TestRailUtil.generateTestRunsForTestCases(testRailProjectID,testRailSuiteID,customReports.getCustomReportBean().getSuiteStartDateAndTime());
 		}catch (Exception e) {
 	        e.printStackTrace();
 	    }
