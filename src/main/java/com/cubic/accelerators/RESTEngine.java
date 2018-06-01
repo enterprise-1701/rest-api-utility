@@ -65,7 +65,7 @@ public class RESTEngine{
 			
 			if((runID==null) || (runID.equalsIgnoreCase("0") || runID.equalsIgnoreCase("%runID%") || runID.equalsIgnoreCase("${runID}") )){
 				    // Need to generate the Test Run JSON (with Test Cases) to filter out the test cases that need to be added to the TestRail Run
-				    TestRailUtil.generateTestRunJSONFromTestNG(context, projectID, suiteID);
+				    TestRailUtil.generateTestRunJSONFromTestNG(context, testRailProjectID, testRailSuiteID);
 				    
 			        // Generate Test Run in TestRail
 					TestRailUtil.generateTestRunsForTestCases(testRailProjectID, testRailSuiteID, customReports.getCustomReportBean().getSuiteStartDateAndTime(), runName);
