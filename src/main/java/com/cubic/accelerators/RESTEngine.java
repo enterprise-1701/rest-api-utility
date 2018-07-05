@@ -12,6 +12,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
+import com.cubic.database.DataBaseUtil;
 import com.cubic.genericutils.GenericConstants;
 import com.cubic.genericutils.TimeUtil;
 import com.cubic.logutils.Log4jUtil;
@@ -143,6 +144,8 @@ public class RESTEngine{
 	public RESTActions setupAutomationTest(ITestContext context, String testCaseName) throws Exception {
 		RESTActions restActions = null;
 		try{
+		    DataBaseUtil.resetConnectionCount();      // Reset any database connection counters before every test starts
+		    
 			// For generating the detailed report for test case(i.e. test method)
 			setupReport(context, testCaseName);
 
