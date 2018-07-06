@@ -416,6 +416,24 @@ public class RESTActions {
 		return responseString;
 	}
 	
+	
+	/**
+	 * Returns Text/xml response as String for Text 'GET' method
+	 * 
+	 * @param url : End point url
+	 * @param headerParameters Request header information,<br> 
+	 * 							 if 'headerParameters' are null then 'headerParameters' are ignored. 
+	 * @param urlQueryParameters url parameters, <br>
+	 * 							   if 'urlQueryParameters' are null then 'urlQueryParameters' are ignored.  
+	 * @return java.lang.String Response in String format
+	 * @throws Throwable
+	 */
+	public String getTextXMLResponseAsString(String url, Hashtable<String, String> headerParameters,
+			Hashtable<String, String> urlQueryParameters) throws Throwable {
+		String responseString = getResponseAsString(url, headerParameters, urlQueryParameters, RESTConstants.TEXT_XML);
+		return responseString;
+	}
+	
 	// Only for internal use with in the class
 	/**<pre>
 	 * Generic to process the "GET" request and return the response(i.e. Json/XML) in string 
