@@ -12,6 +12,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
+import com.cubic.database.DataBaseUtil;
 import com.cubic.genericutils.GenericConstants;
 import com.cubic.genericutils.TimeUtil;
 import com.cubic.logutils.Log4jUtil;
@@ -42,12 +43,13 @@ public class RESTEngine{
 	 * @throws Exception
 	 */
 	@BeforeSuite
-	@Parameters({"projectID","suiteID","runID","test_Rail_Integration_Enable_Flag"})
+	@Parameters({"projectID","suiteID","runID","test_Rail_Integration_Enable_Flag","runName"})
 	public void beforeSuite(ITestContext context,
 			@Optional String projectID,
 			@Optional String suiteID,
 			@Optional String runID,
-			@Optional String test_Rail_Integration_Enable_Flag) throws Exception {
+			@Optional String test_Rail_Integration_Enable_Flag,
+			@Optional String runName) throws Exception {
 		Log4jUtil.configureLog4j(GenericConstants.LOG4J_FILEPATH);
 		
 		
@@ -63,7 +65,11 @@ public class RESTEngine{
 		if(testRailFlag){
 			
 			if((runID==null) || (runID.equalsIgnoreCase("0") || runID.equalsIgnoreCase("%runID%") || runID.equalsIgnoreCase("${runID}") )){
-				TestRailUtil.generateTestRunsForTestCases(testRailProjectID,testRailSuiteID,customReports.getCustomReportBean().getSuiteStartDateAndTime());
+				    // Need to generate the Test Run JSON (with Test Cases) to filter out the test cases that need to be added to the TestRail Run
+				    TestRailUtil.generateTestRunJSONFromTestNG(context, testRailProjectID, testRailSuiteID);
+				    
+			        // Generate Test Run in TestRail
+					TestRailUtil.generateTestRunsForTestCases(testRailProjectID, testRailSuiteID, customReports.getCustomReportBean().getSuiteStartDateAndTime(), runName);
 			}else if(runID!=null && !(runID.equals("0"))){
 				testRailRunID = runID;
 				TestRailUtil.setExistingTestRunID(testRailRunID);
@@ -71,8 +77,6 @@ public class RESTEngine{
 			
 			}
 			
-			
-			TestRailUtil.generateTestRunsForTestCases(testRailProjectID,testRailSuiteID,customReports.getCustomReportBean().getSuiteStartDateAndTime());
 		}catch (Exception e) {
 	        e.printStackTrace();
 	    }
@@ -140,6 +144,8 @@ public class RESTEngine{
 	public RESTActions setupAutomationTest(ITestContext context, String testCaseName) throws Exception {
 		RESTActions restActions = null;
 		try{
+		    DataBaseUtil.resetConnectionCount();      // Reset any database connection counters before every test starts
+		    
 			// For generating the detailed report for test case(i.e. test method)
 			setupReport(context, testCaseName);
 
