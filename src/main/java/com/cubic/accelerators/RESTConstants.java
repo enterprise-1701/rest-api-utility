@@ -9,5 +9,6 @@ public interface RESTConstants {
 	String APPLICATION_TEXT = "application/text";
 	String TEXT_XML = "text/xml";
 	String DISABLE_EXCEPTIONS = "disableExceptions";
+	String CUSTOM_REPORTS = "customReports";
 }
 
