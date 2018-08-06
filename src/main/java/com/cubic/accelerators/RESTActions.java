@@ -2322,18 +2322,18 @@ public class RESTActions {
 					
 					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
 					LOG.info("addExternalSSLCertificatePassword:::::::"+addExternalSSLCertificatePassword);
-					TrustManagerFactory tmf = TrustManagerFactory
-						    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-						// Using null here initialises the TMF with the default trust store.
-							tmf.init((KeyStore) null);
-
-					X509TrustManager defaultTm = null;
-							for (TrustManager tm : tmf.getTrustManagers()) {
-							    if (tm instanceof X509TrustManager) {
-							        defaultTm = (X509TrustManager) tm;
-							        break;
-							    }
-							}	
+//					TrustManagerFactory tmf = TrustManagerFactory
+//						    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+//						// Using null here initialises the TMF with the default trust store.
+//							tmf.init((KeyStore) null);
+//
+//					X509TrustManager defaultTm = null;
+//							for (TrustManager tm : tmf.getTrustManagers()) {
+//							    if (tm instanceof X509TrustManager) {
+//							        defaultTm = (X509TrustManager) tm;
+//							        break;
+//							    }
+//							}	
 							
 				FileInputStream myKeys = new FileInputStream(addExternalSSLCertificatePath);
 				
@@ -2357,54 +2357,56 @@ public class RESTActions {
 					myKeys.close();
 					LOG.info("++++++++++++++++++++++++++++Finished Mykeys close+++++++++++++++++++++++++++++++++++++++++++");
 
-					tmf = TrustManagerFactory
+					TrustManagerFactory tmf = TrustManagerFactory
 					    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
 					tmf.init(myTrustStore);
 
-					// Get hold of the default trust manager
-					X509TrustManager myTm = null;
-					for (TrustManager tm : tmf.getTrustManagers()) {
-					    if (tm instanceof X509TrustManager) {
-					        myTm = (X509TrustManager) tm;
-					        break;
-					    }
-					}
-
-					// Wrap it in your own class.
-					final X509TrustManager finalDefaultTm = defaultTm;
-					final X509TrustManager finalMyTm = myTm;
-					X509TrustManager customTm = new X509TrustManager() {
-					    @Override
-					    public X509Certificate[] getAcceptedIssuers() {
-					        // If you're planning to use client-cert auth,
-					        // merge results from "defaultTm" and "myTm".
-					        return finalDefaultTm.getAcceptedIssuers();
-					    }
-
-					    @Override
-					    public void checkServerTrusted(X509Certificate[] chain,
-					            String authType) throws CertificateException {
-					        try {
-					            finalMyTm.checkServerTrusted(chain, authType);
-					        } catch (CertificateException e) {
-					            // This will throw another CertificateException if this fails too.
-					            finalDefaultTm.checkServerTrusted(chain, authType);
-					        }
-					    }
-
-					    @Override
-					    public void checkClientTrusted(X509Certificate[] chain,
-					            String authType) throws CertificateException {
-					        // If you're planning to use client-cert auth,
-					        // do the same as checking the server.
-					        finalDefaultTm.checkClientTrusted(chain, authType);
-					    }
-					};
+//					// Get hold of the default trust manager
+//					X509TrustManager myTm = null;
+//					for (TrustManager tm : tmf.getTrustManagers()) {
+//					    if (tm instanceof X509TrustManager) {
+//					        myTm = (X509TrustManager) tm;
+//					        break;
+//					    }
+//					}
+//
+//					// Wrap it in your own class.
+//					final X509TrustManager finalDefaultTm = defaultTm;
+//					final X509TrustManager finalMyTm = myTm;
+//					X509TrustManager customTm = new X509TrustManager() {
+//					    @Override
+//					    public X509Certificate[] getAcceptedIssuers() {
+//					        // If you're planning to use client-cert auth,
+//					        // merge results from "defaultTm" and "myTm".
+//					        return finalDefaultTm.getAcceptedIssuers();
+//					    }
+//
+//					    @Override
+//					    public void checkServerTrusted(X509Certificate[] chain,
+//					            String authType) throws CertificateException {
+//					        try {
+//					            finalMyTm.checkServerTrusted(chain, authType);
+//					        } catch (CertificateException e) {
+//					            // This will throw another CertificateException if this fails too.
+//					            finalDefaultTm.checkServerTrusted(chain, authType);
+//					        }
+//					    }
+//
+//					    @Override
+//					    public void checkClientTrusted(X509Certificate[] chain,
+//					            String authType) throws CertificateException {
+//					        // If you're planning to use client-cert auth,
+//					        // do the same as checking the server.
+//					        finalDefaultTm.checkClientTrusted(chain, authType);
+//					    }
+//					};
 
 
 					SSLContext sslcontext = SSLContext.getInstance("TLS");
-					sslcontext.init(null, new TrustManager[] { customTm }, null);
-					SSLContext.setDefault(sslcontext);
+//					sslcontext.init(null, new TrustManager[] { customTm }, null);
+					
+					sslcontext.init(null, tmf.getTrustManagers(), null);
+					//SSLContext.setDefault(sslcontext);
 
 				DefaultClientConfig config = new DefaultClientConfig();
 				Map<String, Object> properties = config.getProperties();
