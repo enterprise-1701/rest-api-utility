@@ -2420,7 +2420,7 @@ public class RESTActions {
 						);
 				properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
 				config.getClasses().add( JacksonJsonProvider.class );
-				LOG.info("Properties:::::::"+properties.size());
+				LOG.info("Properties:::::::"+properties.get(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES));
 				LOG.info("++++++++++++++++++++++++++++Try Block End+++++++++++++++++++++++++++++++++++++++++++");
 				return Client.create(config);
 			}
