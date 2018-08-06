@@ -2337,7 +2337,7 @@ public class RESTActions {
 							
 				FileInputStream myKeys = new FileInputStream(addExternalSSLCertificatePath);
 				
-				try( BufferedReader br =
+				/*try( BufferedReader br =
 				           new BufferedReader( new InputStreamReader(myKeys, "UTF-8" )))
 				   {
 				      StringBuilder sb = new StringBuilder();
@@ -2349,7 +2349,7 @@ public class RESTActions {
 				      LOG.info("Output of the file ::::"+sb.toString());
 				   }catch(Exception e){
 					   
-				   }
+				   }*/
 				
 				KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 					myTrustStore.load(myKeys, addExternalSSLCertificatePassword.toCharArray());
@@ -2403,6 +2403,7 @@ public class RESTActions {
 
 					SSLContext sslcontext = SSLContext.getInstance("TLS");
 					sslcontext.init(null, new TrustManager[] { customTm }, null);
+					SSLContext.setDefault(sslcontext);
 
 				DefaultClientConfig config = new DefaultClientConfig();
 				Map<String, Object> properties = config.getProperties();
