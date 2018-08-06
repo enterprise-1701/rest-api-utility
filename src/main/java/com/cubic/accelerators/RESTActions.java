@@ -2322,6 +2322,9 @@ public class RESTActions {
 					
 					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
 					LOG.info("addExternalSSLCertificatePassword:::::::"+addExternalSSLCertificatePassword);
+					
+					System.setProperty("javax.net.ssl.trustStore","clientcert.jks");
+					System.setProperty("javax.net.ssl.trustStorePassword", "vTC0QdiBbvxuSgKAL1EV");
 //					TrustManagerFactory tmf = TrustManagerFactory
 //						    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
 //						// Using null here initialises the TMF with the default trust store.
@@ -2335,7 +2338,7 @@ public class RESTActions {
 //							    }
 //							}	
 							
-				FileInputStream myKeys = new FileInputStream(addExternalSSLCertificatePath);
+				FileInputStream myKeys = new FileInputStream("clientcert.jks");
 				
 				/*try( BufferedReader br =
 				           new BufferedReader( new InputStreamReader(myKeys, "UTF-8" )))
@@ -2352,7 +2355,7 @@ public class RESTActions {
 				   }*/
 				
 				KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-					myTrustStore.load(myKeys, addExternalSSLCertificatePassword.toCharArray());
+					myTrustStore.load(myKeys, "vTC0QdiBbvxuSgKAL1EV".toCharArray());
 										
 					myKeys.close();
 					LOG.info("++++++++++++++++++++++++++++Finished Mykeys close+++++++++++++++++++++++++++++++++++++++++++");
