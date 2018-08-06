@@ -1,9 +1,11 @@
 package com.cubic.accelerators;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -2334,6 +2336,20 @@ public class RESTActions {
 							}	
 							
 				FileInputStream myKeys = new FileInputStream(addExternalSSLCertificatePath);
+				
+				try( BufferedReader br =
+				           new BufferedReader( new InputStreamReader(myKeys, "UTF-8" )))
+				   {
+				      StringBuilder sb = new StringBuilder();
+				      String line;
+				      while(( line = br.readLine()) != null ) {
+				         sb.append( line );
+				         sb.append( '\n' );
+				      }
+				      LOG.info("Output of the file ::::"+sb.toString());
+				   }catch(Exception e){
+					   
+				   }
 				
 				KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 					myTrustStore.load(myKeys, addExternalSSLCertificatePassword.toCharArray());
