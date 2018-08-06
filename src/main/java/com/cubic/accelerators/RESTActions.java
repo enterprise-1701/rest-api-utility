@@ -2315,6 +2315,11 @@ public class RESTActions {
 		}else {
 				try{
 					
+					LOG.info("++++++++++++++++++++++++++++Catch Block Start+++++++++++++++++++++++++++++++++++++++++++");
+					LOG.info("Class name" + getCallerClassName() + "Method name : " + getCallerMethodName());
+					LOG.info("++++++++++++++++++++++++++++Catch Block End+++++++++++++++++++++++++++++++++++++++++++");
+					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
+					LOG.info("addExternalSSLCertificatePassword:::::::"+addExternalSSLCertificatePassword);
 					TrustManagerFactory tmf = TrustManagerFactory
 						    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
 						// Using null here initialises the TMF with the default trust store.
