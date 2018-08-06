@@ -2317,9 +2317,9 @@ public class RESTActions {
 		}else {
 				try{
 					
-					LOG.info("++++++++++++++++++++++++++++Catch Block Start+++++++++++++++++++++++++++++++++++++++++++");
+					LOG.info("++++++++++++++++++++++++++++try Block Start+++++++++++++++++++++++++++++++++++++++++++");
 					LOG.info("Class name" + getCallerClassName() + "Method name : " + getCallerMethodName());
-					LOG.info("++++++++++++++++++++++++++++Catch Block End+++++++++++++++++++++++++++++++++++++++++++");
+					
 					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
 					LOG.info("addExternalSSLCertificatePassword:::::::"+addExternalSSLCertificatePassword);
 					TrustManagerFactory tmf = TrustManagerFactory
@@ -2355,6 +2355,7 @@ public class RESTActions {
 					myTrustStore.load(myKeys, addExternalSSLCertificatePassword.toCharArray());
 										
 					myKeys.close();
+					LOG.info("++++++++++++++++++++++++++++Finished Mykeys close+++++++++++++++++++++++++++++++++++++++++++");
 
 					tmf = TrustManagerFactory
 					    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -2419,6 +2420,8 @@ public class RESTActions {
 						);
 				properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
 				config.getClasses().add( JacksonJsonProvider.class );
+				LOG.info("Properties:::::::"+properties.size());
+				LOG.info("++++++++++++++++++++++++++++Try Block End+++++++++++++++++++++++++++++++++++++++++++");
 				return Client.create(config);
 			}
 			catch ( KeyManagementException | NoSuchAlgorithmException | KeyStoreException | FileNotFoundException e )
