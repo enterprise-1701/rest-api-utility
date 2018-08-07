@@ -2325,10 +2325,10 @@ public class RESTActions {
 					LOG.info("addExternalSSLCertificatePath:::::::"+System.getProperty("user.dir")
 					+ "/resources/certificates/clientcert.jks");
 					
-					
-					//System.setProperty("javax.net.ssl.trustStore",System.getProperty("user.dir")
-						//	+ "/resources/certificates/clientcert.jks");
-//					System.setProperty("javax.net.ssl.trustStorePassword", "vTC0QdiBbvxuSgKAL1EV");
+					System.setProperty("javax.net.ssl.keyStoreType","pkcs12"); 
+					System.setProperty("javax.net.ssl.keyStore",System.getProperty("user.dir")
+							+ "/resources/certificates/cert.pfx");
+					System.setProperty("javax.net.ssl.keyStorePassword", "vTC0QdiBbvxuSgKAL1EV");
 					//System.setProperty("javax.net.ssl.trustStorePassword", "123456");
 //					TrustManagerFactory tmf = TrustManagerFactory
 //						    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
