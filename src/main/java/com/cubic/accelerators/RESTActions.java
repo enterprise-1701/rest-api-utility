@@ -1,16 +1,10 @@
 package com.cubic.accelerators;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -23,7 +17,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -62,8 +55,8 @@ public class RESTActions {
 	private String testCaseName = null;
 	
 	private String isSSLCertificationVerificationValue  = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("isSSLCertificationVerifcationEnabled");
-	private String addExternalSSLCertificate  = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificate");
-	private String addExternalSSLCertificatePath = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificateJKSPath");
+	private String addExternalSSLCertificateFlag  = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificateFlag");
+	private String addExternalSSLCertificatePath = System.getProperty("user.dir") + GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificateJKSPath");
 	private String addExternalSSLCertificatePassword = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificatePassword");
 	
 	
@@ -2272,16 +2265,13 @@ public class RESTActions {
 	
 	public Client hostIgnoringClient() {
 
-		if(addExternalSSLCertificate==null){
-			addExternalSSLCertificate="FALSE";
+		if(addExternalSSLCertificateFlag==null){
+			addExternalSSLCertificateFlag="FALSE";
 		}
-		if(addExternalSSLCertificate.equalsIgnoreCase("FALSE")){
+		if(addExternalSSLCertificateFlag.equalsIgnoreCase("FALSE")){
 			try{
 				
-				System.setProperty("javax.net.ssl.keyStoreType","pkcs12"); 
-				System.setProperty("javax.net.ssl.keyStore",System.getProperty("user.dir")
-						+ "/resources/certificates/cert.pfx");
-				System.setProperty("javax.net.ssl.keyStorePassword", "vTC0QdiBbvxuSgKAL1EV");
+				
 				
 				TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
 					public X509Certificate[] getAcceptedIssuers() {
@@ -2327,116 +2317,13 @@ public class RESTActions {
 					
 					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
 					LOG.info("addExternalSSLCertificatePassword:::::::"+addExternalSSLCertificatePassword);
-					LOG.info("addExternalSSLCertificatePath:::::::"+System.getProperty("user.dir")
-					+ "/resources/certificates/clientcert.jks");
 					
 					System.setProperty("javax.net.ssl.keyStoreType","pkcs12"); 
-					System.setProperty("javax.net.ssl.keyStore",System.getProperty("user.dir")
-							+ "/resources/certificates/cert.pfx");
-					System.setProperty("javax.net.ssl.keyStorePassword", "vTC0QdiBbvxuSgKAL1EV");
-					//System.setProperty("javax.net.ssl.trustStorePassword", "123456");
-//					TrustManagerFactory tmf = TrustManagerFactory
-//						    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-//						// Using null here initialises the TMF with the default trust store.
-//							tmf.init((KeyStore) null);
-//
-//					X509TrustManager defaultTm = null;
-//							for (TrustManager tm : tmf.getTrustManagers()) {
-//							    if (tm instanceof X509TrustManager) {
-//							        defaultTm = (X509TrustManager) tm;
-//							        break;
-//							    }
-//							}	
-							
-		//		FileInputStream myKeys = new FileInputStream(System.getProperty("user.dir")
-			//			+ "/resources/certificates/clientcert.jks");
-				
-				/*try( BufferedReader br =
-				           new BufferedReader( new InputStreamReader(myKeys, "UTF-8" )))
-				   {
-				      StringBuilder sb = new StringBuilder();
-				      String line;
-				      while(( line = br.readLine()) != null ) {
-				         sb.append( line );
-				         sb.append( '\n' );
-				      }
-				      LOG.info("Output of the file ::::"+sb.toString());
-				   }catch(Exception e){
-					   
-				   }*/
-				
-			//	KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-//					myTrustStore.load(myKeys, "vTC0QdiBbvxuSgKAL1EV".toCharArray());
-					
-				//	myTrustStore.load(myKeys, "123456".toCharArray());
-										
-					//myKeys.close();
-					//LOG.info("++++++++++++++++++++++++++++Finished Mykeys close+++++++++++++++++++++++++++++++++++++++++++");
-
-					//TrustManagerFactory tmf = TrustManagerFactory
-					//    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-					//tmf.init(myTrustStore);
-
-//					// Get hold of the default trust manager
-//					X509TrustManager myTm = null;
-//					for (TrustManager tm : tmf.getTrustManagers()) {
-//					    if (tm instanceof X509TrustManager) {
-//					        myTm = (X509TrustManager) tm;
-//					        break;
-//					    }
-//					}
-//
-//					// Wrap it in your own class.
-//					final X509TrustManager finalDefaultTm = defaultTm;
-//					final X509TrustManager finalMyTm = myTm;
-//					X509TrustManager customTm = new X509TrustManager() {
-//					    @Override
-//					    public X509Certificate[] getAcceptedIssuers() {
-//					        // If you're planning to use client-cert auth,
-//					        // merge results from "defaultTm" and "myTm".
-//					        return finalDefaultTm.getAcceptedIssuers();
-//					    }
-//
-//					    @Override
-//					    public void checkServerTrusted(X509Certificate[] chain,
-//					            String authType) throws CertificateException {
-//					        try {
-//					            finalMyTm.checkServerTrusted(chain, authType);
-//					        } catch (CertificateException e) {
-//					            // This will throw another CertificateException if this fails too.
-//					            finalDefaultTm.checkServerTrusted(chain, authType);
-//					        }
-//					    }
-//
-//					    @Override
-//					    public void checkClientTrusted(X509Certificate[] chain,
-//					            String authType) throws CertificateException {
-//					        // If you're planning to use client-cert auth,
-//					        // do the same as checking the server.
-//					        finalDefaultTm.checkClientTrusted(chain, authType);
-//					    }
-//					};
-
-
-//					SSLContext sslcontext = SSLContext.getInstance("TLS");
-//					sslcontext.init(null, new TrustManager[] { customTm }, null);
-					
-					//sslcontext.init(null, null, null);
-					//SSLContext.setDefault(sslcontext);
+					System.setProperty("javax.net.ssl.keyStore",addExternalSSLCertificatePath);
+					System.setProperty("javax.net.ssl.keyStorePassword", addExternalSSLCertificatePassword);
 
 				DefaultClientConfig config = new DefaultClientConfig();
 				Map<String, Object> properties = config.getProperties();
-//				HTTPSProperties httpsProperties = new HTTPSProperties(
-//						new HostnameVerifier()
-//						{
-//							@Override
-//							public boolean verify( String s, SSLSession sslSession )
-//							{
-//								return true;
-//							}
-//						}, sslcontext
-//						);
-//				properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
 				config.getClasses().add( JacksonJsonProvider.class );
 				LOG.info("Properties:::::::"+properties.get(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES));
 				LOG.info("++++++++++++++++++++++++++++Try Block End+++++++++++++++++++++++++++++++++++++++++++");
@@ -2445,18 +2332,6 @@ public class RESTActions {
 				finally {
 					LOG.info("Done.....");
 				}
-//			catch ( /*KeyManagementException | */NoSuchAlgorithmException /*| KeyStoreException | FileNotFoundException*/ e )
-//			{
-//				throw new RuntimeException( e );
-//			}
-				
-//				catch (CertificateException e) {
-//				// TODO Auto-generated catch block
-//				throw new RuntimeException( e );
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				throw new RuntimeException( e );
-//			}
 		}
 	}
 
