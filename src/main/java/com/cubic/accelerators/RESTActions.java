@@ -2271,12 +2271,17 @@ public class RESTActions {
 	}
 	
 	public Client hostIgnoringClient() {
-		
+
 		if(addExternalSSLCertificate==null){
 			addExternalSSLCertificate="FALSE";
 		}
 		if(addExternalSSLCertificate.equalsIgnoreCase("FALSE")){
 			try{
+				
+				System.setProperty("javax.net.ssl.keyStoreType","pkcs12"); 
+				System.setProperty("javax.net.ssl.keyStore",System.getProperty("user.dir")
+						+ "/resources/certificates/cert.pfx");
+				System.setProperty("javax.net.ssl.keyStorePassword", "vTC0QdiBbvxuSgKAL1EV");
 				
 				TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
 					public X509Certificate[] getAcceptedIssuers() {
