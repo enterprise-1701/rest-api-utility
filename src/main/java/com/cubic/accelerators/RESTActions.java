@@ -2310,13 +2310,19 @@ public class RESTActions {
 				throw new RuntimeException( e );
 			}
 		}else {
+			/*
+			 * This block implemented to add SSL certificate before invoking the REST API calls
+			 * Respective property values should be defined in the GenericFrameworkConfig.properties at project level
+			 * addExternalSSLCertificateFlag : TRUE or FALSE will be decide whether to add external SSL certificate to service call
+			 * addExternalSSLCertificateJKSPath : Relative path of the certificate file where it is available in the project folder. The extension of the file should be pxf
+			 * addExternalSSLCertificatePassword : Password of the security certificate
+			 */
 				try{
 					
 					LOG.info("++++++++++++++++++++++++++++try Block Start+++++++++++++++++++++++++++++++++++++++++++");
 					LOG.info("Class name" + getCallerClassName() + "Method name : " + getCallerMethodName());
 					
 					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
-					LOG.info("addExternalSSLCertificatePassword:::::::"+addExternalSSLCertificatePassword);
 					
 					System.setProperty("javax.net.ssl.keyStoreType","pkcs12"); 
 					System.setProperty("javax.net.ssl.keyStore",addExternalSSLCertificatePath);
