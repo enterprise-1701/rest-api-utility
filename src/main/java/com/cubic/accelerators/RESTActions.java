@@ -2348,8 +2348,8 @@ public class RESTActions {
 //							    }
 //							}	
 							
-				FileInputStream myKeys = new FileInputStream(System.getProperty("user.dir")
-						+ "/resources/certificates/clientcert.jks");
+		//		FileInputStream myKeys = new FileInputStream(System.getProperty("user.dir")
+			//			+ "/resources/certificates/clientcert.jks");
 				
 				/*try( BufferedReader br =
 				           new BufferedReader( new InputStreamReader(myKeys, "UTF-8" )))
@@ -2365,17 +2365,17 @@ public class RESTActions {
 					   
 				   }*/
 				
-				KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			//	KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 //					myTrustStore.load(myKeys, "vTC0QdiBbvxuSgKAL1EV".toCharArray());
 					
-					myTrustStore.load(myKeys, "123456".toCharArray());
+				//	myTrustStore.load(myKeys, "123456".toCharArray());
 										
-					myKeys.close();
-					LOG.info("++++++++++++++++++++++++++++Finished Mykeys close+++++++++++++++++++++++++++++++++++++++++++");
+					//myKeys.close();
+					//LOG.info("++++++++++++++++++++++++++++Finished Mykeys close+++++++++++++++++++++++++++++++++++++++++++");
 
-					TrustManagerFactory tmf = TrustManagerFactory
-					    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-					tmf.init(myTrustStore);
+					//TrustManagerFactory tmf = TrustManagerFactory
+					//    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+					//tmf.init(myTrustStore);
 
 //					// Get hold of the default trust manager
 //					X509TrustManager myTm = null;
@@ -2418,40 +2418,45 @@ public class RESTActions {
 //					};
 
 
-					SSLContext sslcontext = SSLContext.getInstance("TLS");
+//					SSLContext sslcontext = SSLContext.getInstance("TLS");
 //					sslcontext.init(null, new TrustManager[] { customTm }, null);
 					
-					sslcontext.init(null, null, null);
+					//sslcontext.init(null, null, null);
 					//SSLContext.setDefault(sslcontext);
 
 				DefaultClientConfig config = new DefaultClientConfig();
 				Map<String, Object> properties = config.getProperties();
-				HTTPSProperties httpsProperties = new HTTPSProperties(
-						new HostnameVerifier()
-						{
-							@Override
-							public boolean verify( String s, SSLSession sslSession )
-							{
-								return true;
-							}
-						}, sslcontext
-						);
-				properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
+//				HTTPSProperties httpsProperties = new HTTPSProperties(
+//						new HostnameVerifier()
+//						{
+//							@Override
+//							public boolean verify( String s, SSLSession sslSession )
+//							{
+//								return true;
+//							}
+//						}, sslcontext
+//						);
+//				properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
 				config.getClasses().add( JacksonJsonProvider.class );
 				LOG.info("Properties:::::::"+properties.get(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES));
 				LOG.info("++++++++++++++++++++++++++++Try Block End+++++++++++++++++++++++++++++++++++++++++++");
 				return Client.create(config);
 			}
-			catch ( KeyManagementException | NoSuchAlgorithmException | KeyStoreException | FileNotFoundException e )
-			{
-				throw new RuntimeException( e );
-			}catch (CertificateException e) {
-				// TODO Auto-generated catch block
-				throw new RuntimeException( e );
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				throw new RuntimeException( e );
-			}
+				finally {
+					LOG.info("Done.....");
+				}
+//			catch ( /*KeyManagementException | */NoSuchAlgorithmException /*| KeyStoreException | FileNotFoundException*/ e )
+//			{
+//				throw new RuntimeException( e );
+//			}
+				
+//				catch (CertificateException e) {
+//				// TODO Auto-generated catch block
+//				throw new RuntimeException( e );
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				throw new RuntimeException( e );
+//			}
 		}
 	}
 
