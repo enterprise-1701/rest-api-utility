@@ -2322,7 +2322,8 @@ public class RESTActions {
 					
 					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
 					LOG.info("addExternalSSLCertificatePassword:::::::"+addExternalSSLCertificatePassword);
-					
+					LOG.info("addExternalSSLCertificatePath:::::::"+System.getProperty("user.dir")
+					+ "/resources/certificates/clientcert.jks");
 					
 					
 					System.setProperty("javax.net.ssl.trustStore",System.getProperty("user.dir")
