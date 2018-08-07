@@ -2328,7 +2328,8 @@ public class RESTActions {
 					
 					System.setProperty("javax.net.ssl.trustStore",System.getProperty("user.dir")
 							+ "/resources/certificates/clientcert.jks");
-					System.setProperty("javax.net.ssl.trustStorePassword", "vTC0QdiBbvxuSgKAL1EV");
+//					System.setProperty("javax.net.ssl.trustStorePassword", "vTC0QdiBbvxuSgKAL1EV");
+					System.setProperty("javax.net.ssl.trustStorePassword", "123456");
 //					TrustManagerFactory tmf = TrustManagerFactory
 //						    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
 //						// Using null here initialises the TMF with the default trust store.
@@ -2360,7 +2361,9 @@ public class RESTActions {
 				   }*/
 				
 				KeyStore myTrustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-					myTrustStore.load(myKeys, "vTC0QdiBbvxuSgKAL1EV".toCharArray());
+//					myTrustStore.load(myKeys, "vTC0QdiBbvxuSgKAL1EV".toCharArray());
+					
+					myTrustStore.load(myKeys, "123456".toCharArray());
 										
 					myKeys.close();
 					LOG.info("++++++++++++++++++++++++++++Finished Mykeys close+++++++++++++++++++++++++++++++++++++++++++");
