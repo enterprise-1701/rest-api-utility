@@ -2416,7 +2416,7 @@ public class RESTActions {
 					SSLContext sslcontext = SSLContext.getInstance("TLS");
 //					sslcontext.init(null, new TrustManager[] { customTm }, null);
 					
-					sslcontext.init(null, tmf.getTrustManagers(), null);
+					sslcontext.init(null, null, null);
 					//SSLContext.setDefault(sslcontext);
 
 				DefaultClientConfig config = new DefaultClientConfig();
