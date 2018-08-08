@@ -1,6 +1,9 @@
 package com.cubic.accelerators;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -52,6 +55,9 @@ public class RESTEngine{
 			@Optional String runID,
 			@Optional String test_Rail_Integration_Enable_Flag,
 			@Optional String runName) {
+
+		String reportFilePath = generateFilePath();
+		Log4jUtil.setTestDir(reportFilePath); // Used if paths aren't defined in GenericFrameworkConfig
 		Log4jUtil.configureLog4j(GenericConstants.LOG4J_FILEPATH);
 
 		try{
@@ -62,7 +68,7 @@ public class RESTEngine{
 
 		// Create custom report folder structure.
 
-		createFolderStructureForCustomReport(context, testRailFlag);
+		createFolderStructureForCustomReport(context, testRailFlag, reportFilePath);
 		if(testRailFlag){
 
 			if((runID==null) || (runID.equalsIgnoreCase("0") || runID.equalsIgnoreCase("%runID%") || runID.equalsIgnoreCase("${runID}") )){
@@ -82,6 +88,12 @@ public class RESTEngine{
 			LOG.error(Log4jUtil.getStackTrace(e));
 			throw new RuntimeException(e);
 	    }
+	}
+
+	private String generateFilePath() {
+		String dynamicFolder = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+		String resultsFolderPath = GenericConstants.CUSTOM_REPORTS_RESULTS;
+		return resultsFolderPath + dynamicFolder;
 	}
 
 	/**
@@ -218,11 +230,11 @@ public class RESTEngine{
 	 * @return boolean
 	 * @throws Exception
 	 */
-	protected void createFolderStructureForCustomReport(ITestContext context, boolean testRailFlag)  {
+	protected void createFolderStructureForCustomReport(ITestContext context, boolean testRailFlag, String reportFilePath)  {
 		try {
 			customReports = new CustomReports();
 			LOG.info("::::Create Folder Structure::::testRailFlag " + testRailFlag);
-			customReports.createFolderStructureForCustomReport(testRailFlag);
+			customReports.createFolderStructureForCustomReport(testRailFlag, reportFilePath);
 			context.setAttribute(RESTConstants.CUSTOM_REPORTS, customReports);
 		}catch (Exception e) {
 			LOG.error(Log4jUtil.getStackTrace(e));
