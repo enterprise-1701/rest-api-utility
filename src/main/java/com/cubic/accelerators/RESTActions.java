@@ -55,6 +55,9 @@ public class RESTActions {
 	private String testCaseName = null;
 	
 	private String isSSLCertificationVerificationValue  = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("isSSLCertificationVerifcationEnabled");
+	private String addExternalSSLCertificateFlag  = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificateFlag");
+	private String addExternalSSLCertificatePath = System.getProperty("user.dir") + GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificateJKSPath");
+	private String addExternalSSLCertificatePassword = GenericConstants.GENERIC_FW_CONFIG_PROPERTIES.get("addExternalSSLCertificatePassword");
 	
 	
 	/**
@@ -2261,44 +2264,81 @@ public class RESTActions {
 	}
 	
 	public Client hostIgnoringClient() {
-	    try{
-	   
-	    TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-			public X509Certificate[] getAcceptedIssuers() {
-				// TODO Auto-generated method stub
-				return new X509Certificate[0];
-			}
-			public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-				// TODO Auto-generated method stub
-			}
-			public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-				// TODO Auto-generated method stub
+
+		if(addExternalSSLCertificateFlag==null){
+			addExternalSSLCertificateFlag="FALSE";
+		}
+		if(addExternalSSLCertificateFlag.equalsIgnoreCase("FALSE")){
+			try{
 				
+				
+				
+				TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+					public X509Certificate[] getAcceptedIssuers() {
+						// TODO Auto-generated method stub
+						return new X509Certificate[0];
+					}
+					public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+						// TODO Auto-generated method stub
+					}
+					public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+						// TODO Auto-generated method stub
+						
+					}
+				}};
+				
+				SSLContext sslcontext = SSLContext.getInstance( "TLS" );
+				sslcontext.init( null, trustAllCerts, new java.security.SecureRandom());
+				DefaultClientConfig config = new DefaultClientConfig();
+				Map<String, Object> properties = config.getProperties();
+				HTTPSProperties httpsProperties = new HTTPSProperties(
+						new HostnameVerifier()
+						{
+							@Override
+							public boolean verify( String s, SSLSession sslSession )
+							{
+								return true;
+							}
+						}, sslcontext
+						);
+				properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
+				config.getClasses().add( JacksonJsonProvider.class );
+				return Client.create(config);
 			}
-		}};
-	    
-	        SSLContext sslcontext = SSLContext.getInstance( "TLS" );
-	        sslcontext.init( null, trustAllCerts, new java.security.SecureRandom());
-	        DefaultClientConfig config = new DefaultClientConfig();
-	        Map<String, Object> properties = config.getProperties();
-	        HTTPSProperties httpsProperties = new HTTPSProperties(
-	                new HostnameVerifier()
-	                {
-	                    @Override
-	                    public boolean verify( String s, SSLSession sslSession )
-	                    {
-	                        return true;
-	                    }
-	                }, sslcontext
-	        );
-	        properties.put( HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, httpsProperties );
-	        config.getClasses().add( JacksonJsonProvider.class );
-	        return Client.create(config);
-	    }
-	    catch ( KeyManagementException | NoSuchAlgorithmException e )
-	    {
-	        throw new RuntimeException( e );
-	    }
+			catch ( KeyManagementException | NoSuchAlgorithmException e )
+			{
+				throw new RuntimeException( e );
+			}
+		}else {
+			/*
+			 * This block implemented to add SSL certificate before invoking the REST API calls
+			 * Respective property values should be defined in the GenericFrameworkConfig.properties at project level
+			 * addExternalSSLCertificateFlag : TRUE or FALSE will be decide whether to add external SSL certificate to service call
+			 * addExternalSSLCertificateJKSPath : Relative path of the certificate file where it is available in the project folder. The extension of the file should be pxf
+			 * addExternalSSLCertificatePassword : Password of the security certificate
+			 */
+				try{
+					
+					LOG.info("++++++++++++++++++++++++++++try Block Start+++++++++++++++++++++++++++++++++++++++++++");
+					LOG.info("Class name" + getCallerClassName() + "Method name : " + getCallerMethodName());
+					
+					LOG.info("addExternalSSLCertificatePath:::::::"+addExternalSSLCertificatePath);
+					
+					System.setProperty("javax.net.ssl.keyStoreType","pkcs12"); 
+					System.setProperty("javax.net.ssl.keyStore",addExternalSSLCertificatePath);
+					System.setProperty("javax.net.ssl.keyStorePassword", addExternalSSLCertificatePassword);
+
+				DefaultClientConfig config = new DefaultClientConfig();
+				Map<String, Object> properties = config.getProperties();
+				config.getClasses().add( JacksonJsonProvider.class );
+				LOG.info("Properties:::::::"+properties.get(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES));
+				LOG.info("++++++++++++++++++++++++++++Try Block End+++++++++++++++++++++++++++++++++++++++++++");
+				return Client.create(config);
+			}
+				finally {
+					LOG.info("Done.....");
+				}
+		}
 	}
 
 	
