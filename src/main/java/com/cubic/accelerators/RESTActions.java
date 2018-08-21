@@ -2,6 +2,9 @@ package com.cubic.accelerators;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -1894,6 +1897,30 @@ public class RESTActions {
 		}
 		return flag;
 	}
+
+	private void addPatchToArrayReflection(){
+		try {
+			Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+			methodsField.setAccessible(true);
+			// get the methods field modifiers
+			Field modifiersField = Field.class.getDeclaredField("modifiers");
+			// bypass the "private" modifier
+			modifiersField.setAccessible(true);
+
+			// remove the "final" modifier
+			modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+
+			/* valid HTTP methods */
+			String[] methods = {
+					"GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "TRACE", "PATCH"
+			};
+			// set the new methods - including patch
+			methodsField.set(null, methods);
+
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchFieldException e) {
+			e.printStackTrace();
+		}
+	}
  
 	/**
 	 * Generic to process the "PATCH" request.
@@ -1915,12 +1942,13 @@ public class RESTActions {
 		try {
 			
 			DefaultClientConfig config = new DefaultClientConfig();
-			
-			//This workaround has some limitation - you can't put an entity to the request. And additionally, 
-			//it \*probably\* wont work on some containers and maybe in future versions of JDK (containers sometimes have their own implementation of HttpURLConnection).
-		    config.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
-		    
+
+			//https://stackoverflow.com/questions/22355235/patch-request-using-jersey-client/26341128
+			config.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
+
 			WebResource resource = Client.create(config).resource(url);
+
+			addPatchToArrayReflection();
 
 			// If url query parameters are present
 			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
@@ -1975,12 +2003,13 @@ public class RESTActions {
 		try {
 			
 			DefaultClientConfig config = new DefaultClientConfig();
-			
-			//This workaround has some limitation - you can't put an entity to the request. And additionally, 
-			//it \*probably\* wont work on some containers and maybe in future versions of JDK (containers sometimes have their own implementation of HttpURLConnection).
-		    config.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
-		    
+
+			//https://stackoverflow.com/questions/22355235/patch-request-using-jersey-client/26341128
+			config.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
+
 			WebResource resource = Client.create(config).resource(url);
+
+			addPatchToArrayReflection();
 
 			// If url query parameters are present
 			if ((urlQueryParameters != null) && (urlQueryParameters.keySet().toArray().length > 0)) {
