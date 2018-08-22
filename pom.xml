@@ -4,7 +4,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 
   <groupId>com.cubic.restaction</groupId>
   <artifactId>restaction</artifactId>
-  <version>1.4.4</version>
+  <version>1.4.5</version>
   <packaging>jar</packaging>
 
   <name>restaction</name>
@@ -17,7 +17,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	  <dependency>
 		  <groupId>com.cubic.testutil</groupId>
 		  <artifactId>testutil</artifactId>
-		  <version>1.9.1</version>
+		  <version>1.9.0</version>
 	  </dependency>
 	<dependency>
 	    <groupId>org.testng</groupId>
